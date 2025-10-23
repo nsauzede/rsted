@@ -1,0 +1,15 @@
+[package]
+name = "rsted"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1.0.100"
+clap = { version = "4.5.50", features = ["derive"] }
+crossterm = "0.29.0"
+env_logger = "0.11.8"
+log = "0.4.28"
+notify = "8.2.0"
+ratatui = "0.29.0"
+ropey = "1.6.1"
+syntect = "5.3.0"
