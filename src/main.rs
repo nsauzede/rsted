@@ -40,9 +40,10 @@ fn parse_args(file_arg: String, line_arg: Option<String>) -> (PathBuf, usize) {
     };
     // Parse +lineno argument (file:lineno takes precedence)
     if line_num.is_none()
-        && let Some(line_str) = line_arg.and_then(|s| s.strip_prefix('+').map(String::from)) {
-            line_num = line_str.parse().ok();
-        }
+        && let Some(line_str) = line_arg.and_then(|s| s.strip_prefix('+').map(String::from))
+    {
+        line_num = line_str.parse().ok();
+    }
     let file_path = PathBuf::from(path_str);
     let line_num = line_num.unwrap_or(1);
     (file_path, line_num)
