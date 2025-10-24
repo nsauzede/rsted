@@ -19,20 +19,38 @@ use std::path::PathBuf;
 use std::sync::mpsc::{self, Receiver};
 use std::time::Duration;
 #[derive(Parser)]
-#[command(name = "rsted")]
-#[command(about = "Midnight Commander-style console editor")]
-struct Args {
-    file: Option<PathBuf>,
-    line: Option<usize>,
+#[command(name = "rsted", about = "Simple Rust CLI text/source editor")]
+struct Cli {
+    /// File to open, optionally with line number (file[:lineno])
+    #[arg(value_name = "file[:<lineno>]")]
+    file: String,
+    /// Start at line number
+    #[arg(value_name = "+<lineno>", allow_hyphen_values = true)]
+    line: Option<String>,
+}
+fn parse_args(file_arg: String, line_arg: Option<String>) -> (PathBuf, usize) {
+    let (path_str, mut line_num) = if let Some((path, line_str)) = file_arg.rsplit_once(':') {
+        if let Ok(num) = line_str.parse::<usize>() {
+            (path, Some(num))
+        } else {
+            (file_arg.as_str(), None)
+        }
+    } else {
+        (file_arg.as_str(), None)
+    };
+    // Parse +lineno argument (file:lineno takes precedence)
+    if line_num.is_none()
+        && let Some(line_str) = line_arg.and_then(|s| s.strip_prefix('+').map(String::from)) {
+            line_num = line_str.parse().ok();
+        }
+    let file_path = PathBuf::from(path_str);
+    let line_num = line_num.unwrap_or(1);
+    (file_path, line_num)
 }
 fn main() -> Result<()> {
     env_logger::init();
-    let args = Args::parse();
-    let file_path = args
-        .file
-        .unwrap_or_else(|| std::env::current_dir().unwrap().join("hello/src/main.rs"));
-    let file_line = args.line.unwrap_or(1);
-    println!("file_path={} file_line={file_line}", file_path.display());
+    let cli = Cli::parse();
+    let (file_path, file_line) = parse_args(cli.file, cli.line);
     enable_raw_mode()?;
     let mut stdout = io::stdout();
     execute!(stdout, EnterAlternateScreen, EnableMouseCapture)?;
