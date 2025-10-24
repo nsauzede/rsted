@@ -23,7 +23,7 @@ impl Highlighter {
             syntax_set,
             theme_set,
             current_syntax: Some(Arc::new(plain_syntax.clone())),
-            parse_state: ParseState::new(&plain_syntax),
+            parse_state: ParseState::new(plain_syntax),
         }
     }
 

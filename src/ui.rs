@@ -18,16 +18,15 @@ fn draw_editor_area(f: &mut Frame, editor: &mut Editor, area: ratatui::layout::R
     let lines: Vec<Line> = editor
         .get_lines()
         .into_iter()
-        .enumerate()
-        .map(|(_i, line)| {
+        .map(|line| {
             let chunks = editor.highlighter.highlight_line(&line);
             let spans: Vec<Span> = chunks
                 .into_iter()
                 .map(|(syntect_style, text)| {
                     let ratatui_style = Style::new().fg(Color::Rgb(
-                        (syntect_style.foreground.r as u8).min(255),
-                        (syntect_style.foreground.g as u8).min(255),
-                        (syntect_style.foreground.b as u8).min(255),
+                        syntect_style.foreground.r,
+                        syntect_style.foreground.g,
+                        syntect_style.foreground.b,
                     ));
                     Span::styled(text.to_string(), ratatui_style)
                 })

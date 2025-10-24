@@ -26,18 +26,18 @@ pub struct Editor {
 }
 
 impl Editor {
-    pub fn new(file_path: PathBuf) -> Result<Self> {
+    pub fn new(file_path: PathBuf, file_line: usize) -> Result<Self> {
         let content = fs::read_to_string(&file_path).unwrap_or_default();
         let rope = Rope::from_str(&content);
-        let cursor = (0, 0);
+        let cursor = (if file_line > 0 { file_line - 1 } else { 0 }, 0);
 
         let mut highlighter = Highlighter::new();
 
         // Auto-detect file type for syntax highlighting
-        if let Some(ext) = file_path.extension() {
-            if let Some(ext_str) = ext.to_str() {
-                highlighter.set_language(ext_str);
-            }
+        if let Some(ext) = file_path.extension()
+            && let Some(ext_str) = ext.to_str()
+        {
+            highlighter.set_language(ext_str);
         }
 
         let editor = Self {
@@ -230,12 +230,12 @@ impl Editor {
         Ok(())
     }
     pub fn reload(&mut self) {
-        if let Ok(content) = std::fs::read_to_string(&self.file_path) {
-            if content != self.rope.to_string() {
-                self.rope = ropey::Rope::from_str(&content);
-                self.cursor = (0, 0);
-                self.modified = false;
-            }
+        if let Ok(content) = std::fs::read_to_string(&self.file_path)
+            && content != self.rope
+        {
+            self.rope = ropey::Rope::from_str(&content);
+            self.cursor = (0, 0);
+            self.modified = false;
         }
     }
     pub fn mouse_down(&mut self, x: u16, y: u16) {
