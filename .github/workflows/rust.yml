@@ -1,0 +1,26 @@
+name: Rust
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install dependencies
+      run: |
+        sudo apt update --quiet -y
+        sudo apt install --quiet -y lld clang
+        rustup component add llvm-tools-preview clippy rustfmt
+        cargo install cargo-llvm-cov cargo-audit
+    - name: Run tests
+      run: make
