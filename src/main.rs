@@ -22,7 +22,7 @@ use std::time::Duration;
 #[command(name = "rsted", about = "Simple Rust CLI text/source editor")]
 struct Cli {
     /// File to open, optionally with line number (file[:lineno])
-    #[arg(value_name = "file[:<lineno>]")]
+    #[arg(value_name = "file[:<lineno>]", default_value = "hello/src/main.rs")]
     file: String,
     /// Start at line number
     #[arg(value_name = "+<lineno>", allow_hyphen_values = true)]
